@@ -487,15 +487,25 @@ public interface CodingConvention extends Serializable {
   public class AssertionFunctionSpec {
     protected final String functionName;
     protected final JSTypeNative assertedType;
+    protected final Boolean removeFromCode;
 
     @Deprecated
     public AssertionFunctionSpec(String functionName) {
-      this(functionName, null);
+      this(functionName, null, true);
+    }
+
+    public AssertionFunctionSpec(String functionName, Boolean removeFromCode) {
+      this(functionName, null, removeFromCode);
     }
 
     public AssertionFunctionSpec(String functionName, JSTypeNative assertedType) {
+      this(functionName, assertedType, true);
+    }
+
+    public AssertionFunctionSpec(String functionName, JSTypeNative assertedType, Boolean removeFromCode) {
       this.functionName = functionName;
       this.assertedType = assertedType;
+      this.removeFromCode = removeFromCode;
     }
 
     /** Returns the name of the function. */
@@ -528,6 +538,14 @@ public interface CodingConvention extends Serializable {
     public JSType getAssertedNewType(Node call, DeclaredTypeRegistry scope) {
       return assertedType != null
           ? scope.getCommonTypes().getNativeType(assertedType) : null;
+    }
+
+    /**
+     * Returns whether or not the assertion calls should be removed during
+     * compilation.
+     */
+    public Boolean getRemoveFromCode() {
+      return removeFromCode;
     }
   }
 }
