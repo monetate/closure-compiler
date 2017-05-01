@@ -18,6 +18,7 @@ package com.google.javascript.jscomp;
 import com.google.common.base.Preconditions;
 import com.google.javascript.rhino.IR;
 import com.google.javascript.rhino.Node;
+import com.google.javascript.rhino.Token;
 import java.util.regex.Pattern;
 
 /**
@@ -75,6 +76,15 @@ class ExportTestFunctions implements CompilerPass {
           if (isTestFunction(functionNode, functionName)) {
             exportTestFunctionAsSymbol(functionName, n, parent);
           }
+        } else if (isAssignedFunction(n)) {
+          // Support monetate rhino unit tests.
+          // Check for a qualified function assignment.
+          Node functionNode = n.getFirstChild().getFirstChild().getNext();
+          String functionName = NodeUtil.getFunctionName(functionNode);
+          String[] parts = functionName.split("\\.");
+          if (isTestFunction(functionNode, parts[parts.length - 1])) {
+            exportTestFunctionAsSymbol(functionName, n, parent);
+          }
         }
       } else if (NodeUtil.isExprAssign(parent) &&
             !n.getLastChild().isAssign()) {
@@ -107,6 +117,34 @@ class ExportTestFunctions implements CompilerPass {
       Node grandchild = node.getFirstChild().getFirstChild();
       return grandchild != null && grandchild.isFunction();
     }
+    
+    /**
+     * Whether node corresponds to a module function expression declared with var,
+     * which is of the form:
+     * <pre>
+     * qualified.name = function() {
+     *   // Implementation
+     * };
+     * </pre>
+     * This has the AST structure EXPR_RESULT -> ASSIGN -> (_, FUNCTION)
+     * @param node
+     */
+    private boolean isAssignedFunction(Node node) {
+      if (node.getType() == Token.EXPR_RESULT) {
+        Node assign = node.getFirstChild();
+        if (assign != null && assign.getType() == Token.ASSIGN) {
+          Node name = assign.getFirstChild();
+          if (name != null) {
+            Node func = name.getNext();
+            if (func != null) {
+              return func.getType() == Token.FUNCTION;
+            }
+          }
+        }
+      }
+      return false;
+    }
+
   }
 
   @Override

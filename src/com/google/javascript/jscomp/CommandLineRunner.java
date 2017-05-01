@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -418,6 +419,21 @@ public class CommandLineRunner extends
       return allJsInputs;
     }
 
+    @Option(name = "--monetate-disable-property-renaming",
+        handler = BooleanOptionHandler.class,
+        usage = "Turn off property renaming.")
+    private boolean monetate_disable_property_renaming = false;
+
+    @Option(name = "--monetate-remove-console",
+        handler = BooleanOptionHandler.class,
+        usage = "Removes all console statements.")
+    private boolean monetate_remove_console = false;
+
+    @Option(name = "--monetate-export-test-functions",
+        handler = BooleanOptionHandler.class,
+        usage = "Export test symbols.")
+    private boolean monetate_export_test_functions = false;
+
     // Our own option parser to be backwards-compatible.
     // It needs to be public because of the crazy reflection that args4j does.
     public static class BooleanOptionHandler extends OptionHandler<Boolean> {
@@ -711,6 +727,18 @@ public class CommandLineRunner extends
 
     if (flags.generate_exports) {
       options.setGenerateExports(flags.generate_exports);
+    }
+
+    // Add monetate flags
+    if (flags.monetate_disable_property_renaming) {
+        options.propertyRenaming = PropertyRenamingPolicy.OFF;
+    }
+    if (flags.monetate_remove_console) {
+        options.stripTypePrefixes = new HashSet<String>();
+        options.stripTypePrefixes.add("console.");
+    }
+    if (flags.monetate_export_test_functions) {
+        options.exportTestFunctions = true;
     }
 
     WarningLevel wLevel = flags.warning_level;
