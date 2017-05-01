@@ -799,6 +799,28 @@ public class CommandLineRunner extends
         handler = BooleanOptionHandler.class,
         usage = "Disables variable renaming. Cannot be used with ADVANCED optimizations.")
     private boolean renaming = true;
+    // Start Monetate flags
+    @Option(
+      name = "--monetate-disable-property-renaming",
+      handler = BooleanOptionHandler.class,
+      usage = "Turn off property renaming."
+    )
+    private boolean monetate_disable_property_renaming = false;
+
+    @Option(
+      name = "--monetate-remove-console",
+      handler = BooleanOptionHandler.class,
+      usage = "Removes all console statements."
+    )
+    private boolean monetate_remove_console = false;
+
+    @Option(
+      name = "--monetate-export-test-functions",
+      handler = BooleanOptionHandler.class,
+      usage = "Export test symbols."
+    )
+    private boolean monetate_export_test_functions = false;
+    // End Monetate flags
 
     @Argument
     private List<String> arguments = new ArrayList<>();
@@ -1694,6 +1716,21 @@ public class CommandLineRunner extends
     if (flags.useTypesForOptimization) {
       level.setTypeBasedOptimizationOptions(options);
     }
+
+    // Start Monetate flags
+    if (flags.monetate_disable_property_renaming) {
+        options.propertyRenaming = PropertyRenamingPolicy.OFF;
+    }
+
+    if (flags.monetate_remove_console) {
+        options.stripTypePrefixes = new HashSet<String>();
+        options.stripTypePrefixes.add("console.");
+    }
+
+    if (flags.monetate_export_test_functions) {
+        options.exportTestFunctions = true;
+    }
+    // End Monetate flags
 
     if (flags.assumeFunctionWrapper || flags.isolationMode == IsolationMode.IIFE) {
       level.setWrappedOutputOptimizations(options);
