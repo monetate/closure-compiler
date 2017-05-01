@@ -353,7 +353,10 @@ public class ClosureCodingConvention extends CodingConventions.Proxy {
         // TODO(agrieve): It would be better if this could make the first
         // parameter the type of the second parameter.
         new AssertionFunctionSpec("goog.asserts.assertInstanceof",
-            JSTypeNative.OBJECT_TYPE)
+            JSTypeNative.OBJECT_TYPE),
+        new AssertionFunctionSpec("mc.assert.assert", false),
+        new AssertionFunctionSpec("mc.assert.assertArray",
+            JSTypeNative.ARRAY_TYPE, false)
     );
   }
 

@@ -162,7 +162,9 @@ final class ClosureCodeRemoval implements CompilerPass {
     FindAssertionCalls() {
       for (AssertionFunctionSpec spec :
                compiler.getCodingConvention().getAssertionFunctions()) {
-        assertionNames.add(spec.getFunctionName());
+        if (spec.getRemoveFromCode()) {
+          assertionNames.add(spec.getFunctionName());
+        }
       }
     }
 
