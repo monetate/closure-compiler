@@ -547,7 +547,7 @@ public final class ClosureCodingConvention extends CodingConventions.Proxy {
     private final String typeName;
 
     public AssertFunctionByTypeName(String functionName, String typeName) {
-      super(functionName, null);
+      super(functionName);
       this.typeName = typeName;
     }
 
