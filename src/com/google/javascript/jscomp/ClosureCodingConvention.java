@@ -392,7 +392,12 @@ public final class ClosureCodingConvention extends CodingConventions.Proxy {
         new AssertFunctionByTypeName("goog.asserts.assertFunction", "Function"),
         new AssertFunctionByTypeName("goog.asserts.assertArray", "Array"),
         new AssertFunctionByTypeName("goog.asserts.assertElement", "Element"),
-        new AssertInstanceofSpec("goog.asserts.assertInstanceof")
+        new AssertInstanceofSpec("goog.asserts.assertInstanceof"),
+        new AssertionFunctionSpec("mc.assert.assert", false),
+        new AssertionFunctionSpec("mc.assert.assertArray", JSTypeNative.ARRAY_TYPE, false),
+        new AssertionFunctionSpec("mc.assert.assertFunction", JSTypeNative.FUNCTION_FUNCTION_TYPE, false),
+        new AssertionFunctionSpec("mc.assert.assertObject", JSTypeNative.OBJECT_TYPE, false),
+        new AssertionFunctionSpec("mc.assert.assertString", JSTypeNative.STRING_TYPE, false)
     );
   }
 
@@ -518,7 +523,7 @@ public final class ClosureCodingConvention extends CodingConventions.Proxy {
     private final String typeName;
 
     public AssertFunctionByTypeName(String functionName, String typeName) {
-      super(functionName, null);
+      super(functionName);
       this.typeName = typeName;
     }
 

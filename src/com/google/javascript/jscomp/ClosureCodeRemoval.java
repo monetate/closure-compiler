@@ -179,7 +179,9 @@ final class ClosureCodeRemoval implements CompilerPass {
       ImmutableSet.Builder<String> assertionNamesBuilder = ImmutableSet.builder();
       for (AssertionFunctionSpec spec :
                compiler.getCodingConvention().getAssertionFunctions()) {
-        assertionNamesBuilder.add(spec.getFunctionName());
+        if (spec.getRemoveFromCode()) {
+          assertionNamesBuilder.add(spec.getFunctionName());
+        }
       }
       assertionNames = assertionNamesBuilder.build();
     }
