@@ -834,6 +834,15 @@ public class CommandLineRunner extends
         usage = "Disables variable renaming. Cannot be used with ADVANCED optimizations.")
     private boolean renaming = true;
 
+    // Start Monetate flags
+    @Option(
+      name = "--disable-property-renaming",
+      handler = BooleanOptionHandler.class,
+      usage = "Turn off property renaming."
+    )
+    private boolean disable_property_renaming = false;
+    // End Monetate flags
+
     @Option(
       name = "--help_markdown",
       handler = BooleanOptionHandler.class,
@@ -1815,6 +1824,12 @@ public class CommandLineRunner extends
     if (flags.useTypesForOptimization) {
       level.setTypeBasedOptimizationOptions(options);
     }
+
+    // Start Monetate flags
+    if (flags.disable_property_renaming) {
+        options.propertyRenaming = PropertyRenamingPolicy.OFF;
+    }
+    // End Monetate flags
 
     if (flags.assumeFunctionWrapper || flags.isolationMode == IsolationMode.IIFE) {
       level.setWrappedOutputOptimizations(options);
