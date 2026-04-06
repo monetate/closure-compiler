@@ -75,7 +75,6 @@ public final class IdMappingUtilTest {
         IdMappingUtil.parseSectionAsStream(
             new ByteArrayInputStream(mapping.toString().getBytes(UTF_8)), "gen1");
 
-    assertThat(result).hasSize(1);
-    assertThat(result).containsEntry("id1", "data1");
+    assertThat(result).containsExactly("id1", "data1");
   }
 }

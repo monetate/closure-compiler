@@ -16,6 +16,8 @@
 
 package com.google.javascript.jscomp;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.BiMap;
@@ -26,7 +28,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -125,7 +126,7 @@ public final class IdMappingUtil {
       InputStream stream, String sectionFilter) throws IOException {
     ImmutableMap.Builder<String, String> mapBuilder = ImmutableMap.builder();
 
-    BufferedReader br = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+    BufferedReader br = new BufferedReader(new InputStreamReader(stream, UTF_8));
     MappingReader mr = new MappingReader(br);
     boolean inSection = false;
 
