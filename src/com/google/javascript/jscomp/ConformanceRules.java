@@ -1461,14 +1461,14 @@ public final class ConformanceRules {
     }
 
     @Override
-    public void check(
-        NodeTraversal t, Node n, LibraryLevelNonAllowlistedConformanceViolationsBehavior behavior) {
-      customRule.check(t, n, behavior);
+    public @Nullable Precondition getPrecondition() {
+      return customRule.getPrecondition();
     }
 
     @Override
-    public @Nullable Precondition getPrecondition() {
-      return customRule.getPrecondition();
+    public void check(
+        NodeTraversal t, Node n, LibraryLevelNonAllowlistedConformanceViolationsBehavior behavior) {
+      customRule.check(t, n, behavior);
     }
 
     private Rule createRule(AbstractCompiler compiler, Requirement requirement)
