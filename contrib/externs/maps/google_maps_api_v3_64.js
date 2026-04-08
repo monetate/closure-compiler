@@ -161,14 +161,14 @@ google.maps.Animation = {
    * Marker bounces until animation is stopped by calling {@link
    * google.maps.Marker.setAnimation} with <code>null</code>.
    */
-  BOUNCE: 0,
+  BOUNCE: 1,
   /**
    * Marker drops from the top of the map to its final location. Animation will
    * cease once the marker comes to rest and {@link
    * google.maps.Marker.getAnimation} will return <code>null</code>. This type
    * of animation is usually specified during creation of the marker.
    */
-  DROP: 0,
+  DROP: 2,
 };
 
 /**
@@ -650,113 +650,113 @@ google.maps.ControlPosition = {
   /**
    * Equivalent to BOTTOM_CENTER in both LTR and RTL.
    */
-  BLOCK_END_INLINE_CENTER: 0,
+  BLOCK_END_INLINE_CENTER: 24,
   /**
    * Equivalent to BOTTOM_RIGHT in LTR, or BOTTOM_LEFT in RTL.
    */
-  BLOCK_END_INLINE_END: 0,
+  BLOCK_END_INLINE_END: 25,
   /**
    * Equivalent to BOTTOM_LEFT in LTR, or BOTTOM_RIGHT in RTL.
    */
-  BLOCK_END_INLINE_START: 0,
+  BLOCK_END_INLINE_START: 23,
   /**
    * Equivalent to TOP_CENTER in both LTR and RTL.
    */
-  BLOCK_START_INLINE_CENTER: 0,
+  BLOCK_START_INLINE_CENTER: 15,
   /**
    * Equivalent to TOP_RIGHT in LTR, or TOP_LEFT in RTL.
    */
-  BLOCK_START_INLINE_END: 0,
+  BLOCK_START_INLINE_END: 16,
   /**
    * Equivalent to TOP_LEFT in LTR, or TOP_RIGHT in RTL.
    */
-  BLOCK_START_INLINE_START: 0,
+  BLOCK_START_INLINE_START: 14,
   /**
    * Elements are positioned in the center of the bottom row. Consider using
    * BLOCK_END_INLINE_CENTER instead.
    */
-  BOTTOM_CENTER: 0,
+  BOTTOM_CENTER: 11,
   /**
    * Elements are positioned in the bottom left and flow towards the middle.
    * Elements are positioned to the right of the Google logo. Consider using
    * BLOCK_END_INLINE_START instead.
    */
-  BOTTOM_LEFT: 0,
+  BOTTOM_LEFT: 10,
   /**
    * Elements are positioned in the bottom right and flow towards the middle.
    * Elements are positioned to the left of the copyrights. Consider using
    * BLOCK_END_INLINE_END instead.
    */
-  BOTTOM_RIGHT: 0,
+  BOTTOM_RIGHT: 12,
   /**
    * Equivalent to RIGHT_CENTER in LTR, or LEFT_CENTER in RTL.
    */
-  INLINE_END_BLOCK_CENTER: 0,
+  INLINE_END_BLOCK_CENTER: 21,
   /**
    * Equivalent to RIGHT_BOTTOM in LTR, or LEFT_BOTTOM in RTL.
    */
-  INLINE_END_BLOCK_END: 0,
+  INLINE_END_BLOCK_END: 22,
   /**
    * Equivalent to RIGHT_TOP in LTR, or LEFT_TOP in RTL.
    */
-  INLINE_END_BLOCK_START: 0,
+  INLINE_END_BLOCK_START: 20,
   /**
    * Equivalent to LEFT_CENTER in LTR, or RIGHT_CENTER in RTL.
    */
-  INLINE_START_BLOCK_CENTER: 0,
+  INLINE_START_BLOCK_CENTER: 17,
   /**
    * Equivalent to LEFT_BOTTOM in LTR, or RIGHT_BOTTOM in RTL.
    */
-  INLINE_START_BLOCK_END: 0,
+  INLINE_START_BLOCK_END: 19,
   /**
    * Equivalent to LEFT_TOP in LTR, or RIGHT_TOP in RTL.
    */
-  INLINE_START_BLOCK_START: 0,
+  INLINE_START_BLOCK_START: 18,
   /**
    * Elements are positioned on the left, above bottom-left elements, and flow
    * upwards. Consider using INLINE_START_BLOCK_END instead.
    */
-  LEFT_BOTTOM: 0,
+  LEFT_BOTTOM: 6,
   /**
    * Elements are positioned in the center of the left side. Consider using
    * INLINE_START_BLOCK_CENTER instead.
    */
-  LEFT_CENTER: 0,
+  LEFT_CENTER: 4,
   /**
    * Elements are positioned on the left, below top-left elements, and flow
    * downwards. Consider using INLINE_START_BLOCK_START instead.
    */
-  LEFT_TOP: 0,
+  LEFT_TOP: 5,
   /**
    * Elements are positioned on the right, above bottom-right elements, and flow
    * upwards. Consider using INLINE_END_BLOCK_END instead.
    */
-  RIGHT_BOTTOM: 0,
+  RIGHT_BOTTOM: 9,
   /**
    * Elements are positioned in the center of the right side. Consider using
    * INLINE_END_BLOCK_CENTER instead.
    */
-  RIGHT_CENTER: 0,
+  RIGHT_CENTER: 8,
   /**
    * Elements are positioned on the right, below top-right elements, and flow
    * downwards. Consider using INLINE_END_BLOCK_START instead.
    */
-  RIGHT_TOP: 0,
+  RIGHT_TOP: 7,
   /**
    * Elements are positioned in the center of the top row. Consider using
    * BLOCK_START_INLINE_CENTER instead.
    */
-  TOP_CENTER: 0,
+  TOP_CENTER: 2,
   /**
    * Elements are positioned in the top left and flow towards the middle.
    * Consider using BLOCK_START_INLINE_START instead.
    */
-  TOP_LEFT: 0,
+  TOP_LEFT: 1,
   /**
    * Elements are positioned in the top right and flow towards the middle.
    * Consider using BLOCK_START_INLINE_END instead.
    */
-  TOP_RIGHT: 0,
+  TOP_RIGHT: 3,
 };
 
 /**
@@ -3398,6 +3398,7 @@ google.maps.FeatureType = {
    */
   COUNTRY: 'COUNTRY',
   /**
+   * Available only in the v=beta channel: https://goo.gle/3oAthT3.
    * Indicates a third-party dataset.
    */
   DATASET: 'DATASET',
@@ -6909,6 +6910,12 @@ google.maps.Maps3DLibrary.prototype.SteadyChangeEvent;
  * @record
  */
 google.maps.MapsAppCheckTokenResult = function() {};
+
+/**
+ * The Firebase App Check token.
+ * @type {string}
+ */
+google.maps.MapsAppCheckTokenResult.prototype.token;
 
 /**
  * An event listener, created by <code><a
@@ -10480,11 +10487,11 @@ google.maps.StrokePosition = {
   /**
    * The stroke lies inside the polygon.
    */
-  INSIDE: 0,
+  INSIDE: 1,
   /**
    * The stroke lies outside the polygon.
    */
-  OUTSIDE: 0,
+  OUTSIDE: 2,
 };
 
 /**
@@ -10692,11 +10699,11 @@ google.maps.SymbolPath = {
   /**
    * A backward-pointing closed arrow.
    */
-  BACKWARD_CLOSED_ARROW: 0,
+  BACKWARD_CLOSED_ARROW: 3,
   /**
    * A backward-pointing open arrow.
    */
-  BACKWARD_OPEN_ARROW: 0,
+  BACKWARD_OPEN_ARROW: 4,
   /**
    * A circle.
    */
@@ -10704,11 +10711,11 @@ google.maps.SymbolPath = {
   /**
    * A forward-pointing closed arrow.
    */
-  FORWARD_CLOSED_ARROW: 0,
+  FORWARD_CLOSED_ARROW: 1,
   /**
    * A forward-pointing open arrow.
    */
-  FORWARD_OPEN_ARROW: 0,
+  FORWARD_OPEN_ARROW: 2,
 };
 
 /**
@@ -11033,6 +11040,7 @@ google.maps.TransitMode = {
    */
   BUS: 'BUS',
   /**
+   * Available only in the v=beta channel: https://goo.gle/3oAthT3.
    * Specifies light rail as a preferred mode of transit.
    */
   LIGHT_RAIL: 'LIGHT_RAIL',
@@ -11193,6 +11201,7 @@ google.maps.TravelMode = {
    */
   TRANSIT: 'TRANSIT',
   /**
+   * Available only in the v=beta channel: https://goo.gle/3oAthT3.
    * Specifies a two-wheeler directions request.
    */
   TWO_WHEELER: 'TWO_WHEELER',
@@ -11216,7 +11225,7 @@ google.maps.UnitSystem = {
    * Specifies that distances in the <code>DirectionsResult</code> should be
    * expressed in imperial units.
    */
-  IMPERIAL: 0,
+  IMPERIAL: 1,
   /**
    * Specifies that distances in the <code>DirectionsResult</code> should be
    * expressed in metric units.
@@ -17274,6 +17283,7 @@ google.maps.maps3d.MapMode = {
    */
   HYBRID: 'HYBRID',
   /**
+   * Available only in the v=alpha channel: https://goo.gle/js-alpha-channel.
    * This map mode displays a normal street map.
    */
   ROADMAP: 'ROADMAP',
@@ -18539,9 +18549,12 @@ google.maps.marker.AdvancedMarkerElementOptions.prototype.title;
  * <code>AdvancedMarkerElement</code>s with lower values. By default,
  * <code>AdvancedMarkerElement</code>s are displayed according to their vertical
  * position on screen, with lower <code>AdvancedMarkerElement</code>s appearing
- * in front of <code>AdvancedMarkerElement</code>s farther up the screen. Note
- * that <code>zIndex</code> is also used to help determine relative priority
- * between {@link
+ * in front of <code>AdvancedMarkerElement</code>s farther up the screen. Mixing
+ * markers with an explicit <code>zIndex</code> and markers without one can lead
+ * to unexpected visual results. To ensure predictable behavior, it is
+ * recommended to either set the <code>zIndex</code> for all markers or leave it
+ * unset. Note that <code>zIndex</code> is also used to help determine relative
+ * priority between {@link
  * google.maps.CollisionBehavior.OPTIONAL_AND_HIDES_LOWER_PRIORITY} Advanced
  * Markers. A higher <code>zIndex</code> value indicates higher priority.
  * @type {number|null|undefined}
