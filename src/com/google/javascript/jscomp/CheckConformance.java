@@ -19,6 +19,7 @@ package com.google.javascript.jscomp;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.collect.ImmutableList.toImmutableList;
+import static com.google.javascript.jscomp.ConformanceConfig.LibraryLevelNonAllowlistedConformanceViolationsBehavior.RECORD_ONLY;
 import static com.google.javascript.jscomp.ConformanceConfig.LibraryLevelNonAllowlistedConformanceViolationsBehavior.UNSPECIFIED;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -436,15 +437,27 @@ public final class CheckConformance implements NodeTraversal.Callback, CompilerP
           // has a rule_id, so it's extendable
           extendable.put(requirement.getRuleId(), builder);
         }
+        var hasBehavior = config.hasLibraryLevelNonAllowlistedConformanceViolationsBehavior();
+        var behavior = config.getLibraryLevelNonAllowlistedConformanceViolationsBehavior();
         if (!requirement.hasExtends()) {
           // does not extend anything, so it's a root requirement. May or may not have a rule_id.
           if (!isLibraryLevelConformanceReportingMode) {
             rootRequirements.put(builder, UNSPECIFIED);
           } else {
-            var hasBehavior = config.hasLibraryLevelNonAllowlistedConformanceViolationsBehavior();
-            var behavior = config.getLibraryLevelNonAllowlistedConformanceViolationsBehavior();
             rootRequirements.put(builder, hasBehavior ? behavior : UNSPECIFIED);
           }
+        }
+        // Enforce that requirements used in library-level conformance checks must have their
+        // rule_id or extends fields set.
+        boolean libraryLevelConformanceEnabled =
+            isLibraryLevelConformanceReportingMode && hasBehavior && behavior == RECORD_ONLY;
+        if (!requirement.hasRuleId()
+            && !requirement.hasExtends()
+            && libraryLevelConformanceEnabled) {
+          reportInvalidRequirement(
+              compiler,
+              requirement,
+              "Library-level conformance requirements require their rule_id or extends field set.");
         }
       }
     }

@@ -3418,6 +3418,109 @@ public final class CheckConformanceTest extends CompilerTestCase {
   }
 
   @Test
+  public void testLibraryLevelConformance_requiresRuleIdOrExtends_failsWhenBothMissing() {
+    reportingMode = ConformanceReportingMode.RESPECT_LIBRARY_LEVEL_BEHAVIOR_SPECIFIED_IN_CONFIG;
+    allowSourcelessWarnings();
+    configuration =
+        """
+        library_level_non_allowlisted_conformance_violations_behavior: RECORD_ONLY
+        requirement: {
+          type: BANNED_NAME
+          value: 'eval'
+          error_message: 'eval is not allowed'
+        }
+        """;
+
+    testError(
+        "eval();",
+        CheckConformance.INVALID_REQUIREMENT_SPEC,
+        "Invalid requirement. Reason: Library-level conformance requirements require their"
+            + " rule_id or extends field set.\n"
+            + "Requirement spec:\n"
+            + "error_message: \"eval is not allowed\"\n"
+            + "type: BANNED_NAME\n"
+            + "value: \"eval\"\n");
+  }
+
+  @Test
+  public void testLibraryLevelConformance_requiresRuleIdOrExtends_passesWhenRuleIdPresent() {
+    reportingMode = ConformanceReportingMode.RESPECT_LIBRARY_LEVEL_BEHAVIOR_SPECIFIED_IN_CONFIG;
+    allowSourcelessWarnings();
+    configuration =
+        """
+        library_level_non_allowlisted_conformance_violations_behavior: RECORD_ONLY
+        requirement: {
+          rule_id: 'eval-rule'
+          type: BANNED_NAME
+          value: 'eval'
+          error_message: 'eval is not allowed'
+        }
+        """;
+
+    testNoWarning("eval();");
+  }
+
+  @Test
+  public void testLibraryLevelConformance_requiresRuleIdOrExtends_passesWhenExtendsPresent() {
+    reportingMode = ConformanceReportingMode.RESPECT_LIBRARY_LEVEL_BEHAVIOR_SPECIFIED_IN_CONFIG;
+    allowSourcelessWarnings();
+    configuration = "";
+    baseConfiguration =
+        """
+        requirement: {
+          rule_id: 'base-rule'
+          type: BANNED_NAME
+          value: 'eval'
+          error_message: 'eval is not allowed'
+        }
+        """;
+    extendingConfiguration =
+        """
+        library_level_non_allowlisted_conformance_violations_behavior: RECORD_ONLY
+        requirement: {
+          extends: 'base-rule'
+        }
+        """;
+
+    testNoWarning("eval();");
+  }
+
+  @Test
+  public void
+      testLibraryLevelConformance_requiresRuleIdOrExtends_passesWhenBehaviorIsNotRecordOnly() {
+    reportingMode = ConformanceReportingMode.RESPECT_LIBRARY_LEVEL_BEHAVIOR_SPECIFIED_IN_CONFIG;
+    allowSourcelessWarnings();
+    configuration =
+        """
+        library_level_non_allowlisted_conformance_violations_behavior: REPORT_AS_BUILD_ERROR
+        requirement: {
+          type: BANNED_NAME
+          value: 'eval'
+          error_message: 'eval is not allowed'
+        }
+        """;
+
+    testWarning("eval();", CheckConformance.CONFORMANCE_VIOLATION);
+  }
+
+  @Test
+  public void testLibraryLevelConformance_requiresRuleIdOrExtends_passesWhenNotLibraryLevelMode() {
+    reportingMode = ConformanceReportingMode.IGNORE_LIBRARY_LEVEL_BEHAVIOR_SPECIFIED_IN_CONFIG;
+    allowSourcelessWarnings();
+    configuration =
+        """
+        library_level_non_allowlisted_conformance_violations_behavior: RECORD_ONLY
+        requirement: {
+          type: BANNED_NAME
+          value: 'eval'
+          error_message: 'eval is not allowed'
+        }
+        """;
+
+    testWarning("eval();", CheckConformance.CONFORMANCE_VIOLATION);
+  }
+
+  @Test
   public void testCustomBanUnknownProp_mergeConfigWithValue() {
     configuration =
         config(
