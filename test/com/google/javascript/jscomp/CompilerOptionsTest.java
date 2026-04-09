@@ -17,6 +17,7 @@
 package com.google.javascript.jscomp;
 
 import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.javascript.jscomp.CompilerOptions.BrowserFeaturesetYear;
@@ -25,6 +26,10 @@ import com.google.javascript.jscomp.parsing.parser.FeatureSet;
 import com.google.javascript.jscomp.parsing.parser.FeatureSet.Feature;
 import com.google.javascript.rhino.Node;
 import com.google.javascript.rhino.Token;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -184,5 +189,23 @@ public final class CompilerOptionsTest {
         .isEqualTo("some/path");
     assertThat(pattern.matcher("bazel-out/k8-fastbin/genfiles/some/path").replaceAll(""))
         .isEqualTo("some/path");
+  }
+
+  @Test
+  public void testAllInstanceFieldsArePrivate() {
+    Field[] fields = CompilerOptions.class.getDeclaredFields();
+    List<String> nonPrivateInstanceFields = new ArrayList<>();
+    for (Field field : fields) {
+      if (field.isSynthetic()) {
+        continue;
+      }
+      int modifiers = field.getModifiers();
+      if (!Modifier.isStatic(modifiers) && !Modifier.isPrivate(modifiers)) {
+        nonPrivateInstanceFields.add(field.getName());
+      }
+    }
+    assertWithMessage("All instance fields in CompilerOptions must be private.")
+        .that(nonPrivateInstanceFields)
+        .isEmpty();
   }
 }
