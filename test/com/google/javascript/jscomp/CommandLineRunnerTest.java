@@ -33,6 +33,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.io.Files;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -3616,6 +3617,100 @@ Expected --production_instrumentation_array_name to be set when --instrument_for
     test("const x = {", RhinoErrorReporter.PARSE_ERROR);
   }
 
+  @Test
+  public void testExpectedDiagnostics_matchErrorAndWarning() {
+    args.add("--jscomp_error=checkTypes");
+    args.add("--jscomp_warning=uselessCode");
+    ImmutableList<JSError> actualErrors =
+        testExpectedDiagnostics(
+            "/** @type {string} */ var x = 1; var y = 1; y;",
+            new String[] {
+              """
+              input0:1:30: ERROR - \\[JSC_TYPE_MISMATCH\\] initializing variable
+              found   : number
+              required: string\
+              """,
+              "input0:1:44: WARNING - \\[JSC_USELESS_CODE\\] Suspicious code. This code lacks"
+                  + " side-effects. Is there a bug?",
+            });
+    assertThat(actualErrors).isEmpty();
+  }
+
+  @Test
+  public void testExpectedDiagnostics_partialMatch() {
+    args.add("--jscomp_error=checkTypes");
+    ImmutableList<JSError> actualErrors =
+        testExpectedDiagnostics(
+            "/** @type {string} */ var x = 1;", new String[] {"JSC_TYPE_MISMATCH"});
+    assertThat(actualErrors).isEmpty();
+  }
+
+  @Test
+  public void testExpectedDiagnostics_regexMatch() {
+    args.add("--jscomp_error=checkTypes");
+    ImmutableList<JSError> actualErrors =
+        testExpectedDiagnostics(
+            "/** @type {string} */ var x = 1;",
+            new String[] {"input0:.* ERROR - \\[JSC_TYPE_MISMATCH\\] .*"});
+    assertThat(actualErrors).isEmpty();
+  }
+
+  @Test
+  public void testExpectedDiagnostics_unmatchedExpectation() {
+    args.add("--jscomp_error=checkTypes");
+    ImmutableList<JSError> actualErrors =
+        testExpectedDiagnostics(
+            "/** @type {string} */ var x = 1;", new String[] {".*JSC_OTHER_ERROR.*"});
+    assertThat(actualErrors).hasSize(2);
+    assertError(actualErrors.get(0))
+        .hasType(AbstractCommandLineRunner.EXPECTED_DIAGNOSTIC_NOT_FOUND);
+    assertError(actualErrors.get(0))
+        .hasMessage("Expected diagnostic not found: .*JSC_OTHER_ERROR.*");
+    assertError(actualErrors.get(1)).hasType(TypeValidator.TYPE_MISMATCH_WARNING);
+  }
+
+  @Test
+  public void testExpectedDiagnostics_ambiguousMatch() {
+    args.add("--jscomp_error=checkTypes");
+    ImmutableList<JSError> actualErrors =
+        testExpectedDiagnostics(
+            "/** @type {string} */ var x = 1;",
+            new String[] {".*JSC_TYPE_MISMATCH.*", ".*initializing variable.*"});
+    assertThat(actualErrors).hasSize(1);
+    assertError(actualErrors.get(0)).hasType(AbstractCommandLineRunner.AMBIGUOUS_EXPECTATION);
+    assertError(actualErrors.get(0))
+        .hasMessage(
+            "Multiple expected diagnostics matched the error: \"input0:1:30: ERROR -"
+                + " [JSC_TYPE_MISMATCH] initializing variable\n"
+                + "found   : number\n"
+                + "required: string\n"
+                + "\". Matches: \".*JSC_TYPE_MISMATCH.*\"");
+  }
+
+  @Test
+  public void testExpectedDiagnostics_identicalExpectations() {
+    args.add("--jscomp_error=checkTypes");
+    ImmutableList<JSError> actualErrors =
+        testExpectedDiagnostics(
+            "/** @type {string} */ var x = 1; /** @type {number} */ var y = 'a';",
+            new String[] {".*JSC_TYPE_MISMATCH.*", ".*JSC_TYPE_MISMATCH.*"});
+    assertThat(actualErrors).isEmpty();
+  }
+
+  @Test
+  public void testExpectedDiagnostics_singleRegexMultipleActuals() {
+    args.add("--jscomp_error=checkTypes");
+
+    ImmutableList<JSError> actualErrors =
+        testExpectedDiagnostics(
+            "/** @type {string} */ var x = 1; /** @type {number} */ var y = 'a';",
+            new String[] {".*JSC_TYPE_MISMATCH.*"});
+    assertThat(actualErrors).hasSize(1);
+    assertError(actualErrors.get(0)).hasType(TypeValidator.TYPE_MISMATCH_WARNING);
+    assertError(actualErrors.get(0))
+        .hasMessage("initializing variable\nfound   : string\nrequired: number");
+  }
+
   /* Helper functions */
 
   private void testSame(String original) {
@@ -3713,6 +3808,7 @@ Expected --production_instrumentation_array_name to be set when --instrument_for
           .isEqualTo(0);
     }
   }
+
 
   private CommandLineRunner createCommandLineRunner(String[] original) {
     for (int i = 0; i < original.length; i++) {
@@ -3882,6 +3978,24 @@ Expected --production_instrumentation_array_name to be set when --instrument_for
     lastCompiler = runner.getCompiler();
     lastCommandLineRunner = runner;
     return lastCompiler;
+  }
+
+  @CanIgnoreReturnValue
+  private ImmutableList<JSError> testExpectedDiagnostics(
+      String input, String[] expectedDiagnostics) {
+    for (String diag : expectedDiagnostics) {
+      args.add("--expected_diagnostics=" + diag);
+    }
+    compile(new String[] {input});
+
+    Compiler compiler = lastCompiler;
+    ImmutableList<JSError> actualDiagnostics =
+        ImmutableList.<JSError>builder()
+            .addAll(compiler.getErrors())
+            .addAll(compiler.getWarnings())
+            .build();
+
+    return actualDiagnostics;
   }
 
   private Node parse(String[] original) {

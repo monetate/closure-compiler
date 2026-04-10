@@ -143,6 +143,15 @@ public abstract class AbstractCommandLineRunner<A extends Compiler, B extends Co
           "When using --chunk or --module flags, the --create_source_map flag must contain "
               + "%outname% in the value.");
 
+  static final DiagnosticType EXPECTED_DIAGNOSTIC_NOT_FOUND =
+      DiagnosticType.error(
+          "JSC_EXPECTED_DIAGNOSTIC_NOT_FOUND", "Expected diagnostic not found: {0}");
+
+  static final DiagnosticType AMBIGUOUS_EXPECTATION =
+      DiagnosticType.error(
+          "JSC_AMBIGUOUS_EXPECTATION",
+          "Multiple expected diagnostics matched the error: \"{0}\". Matches: \"{1}\"");
+
   static final String WAITING_FOR_INPUT_WARNING = "The compiler is waiting for input via stdin.";
   // Use an 8MiB buffer since the concatenated TypedAst file can be very large.
   private static final int GZIPPED_TYPEDAST_BUFFER_SIZE = 8 * 1024 * 1024;
@@ -1148,6 +1157,10 @@ public abstract class AbstractCommandLineRunner<A extends Compiler, B extends Co
     Compiler.setLoggingLevel(Level.parse(config.loggingLevel));
 
     compiler = createCompiler();
+    if (!config.expectedDiagnostics.isEmpty()) {
+      compiler.setErrorManager(
+          new VerifyingErrorManager(compiler.getErrorManager(), config.expectedDiagnostics));
+    }
     B options = createOptions();
     setRunOptions(options);
 
@@ -1271,7 +1284,7 @@ public abstract class AbstractCommandLineRunner<A extends Compiler, B extends Co
       try {
         // This is the common case - we're actually compiling something.
         performCompilation(metricsRecorder);
-        result = compiler.getResult();
+
         // If we're finished with compilation (i.e. we're not saving state), /and/ the compiler was
         // restored from a previous state, then we need to re-initialize the set of chunks.
         // TODO(lharker): figure out if this is still needed.
@@ -1287,6 +1300,7 @@ public abstract class AbstractCommandLineRunner<A extends Compiler, B extends Co
         // exception somewhere.
         compiler.generateReport();
       }
+      result = compiler.getResult();
     }
 
     if (createCommonJsModules) {
@@ -1444,7 +1458,7 @@ public abstract class AbstractCommandLineRunner<A extends Compiler, B extends Co
     } else {
       // parsing!
       compiler.parseForCompilation();
-  }
+    }
   }
 
   private void restoreState(String filename) {
@@ -2574,6 +2588,19 @@ public abstract class AbstractCommandLineRunner<A extends Compiler, B extends Co
     @CanIgnoreReturnValue
     public CommandLineConfig setParseInlineSourceMaps(boolean parseInlineSourceMaps) {
       this.parseInlineSourceMaps = parseInlineSourceMaps;
+      return this;
+    }
+
+    private final List<String> expectedDiagnostics = new ArrayList<>();
+
+    /**
+     * Expected diagnostics in the format [(line,col)]CODE:regex. CODE is the JSCompiler
+     * DiagnosticType key. regex matches the description.
+     */
+    @CanIgnoreReturnValue
+    public CommandLineConfig setExpectedDiagnostics(List<String> expectedDiagnostics) {
+      this.expectedDiagnostics.clear();
+      this.expectedDiagnostics.addAll(expectedDiagnostics);
       return this;
     }
 

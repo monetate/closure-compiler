@@ -951,6 +951,13 @@ public class CommandLineRunner extends AbstractCommandLineRunner<Compiler, Compi
                 + "renaming map produced by a previous compilation")
     private String propertyMapInputFile = "";
 
+    @Option(
+        name = "--expected_diagnostics",
+        usage =
+            "Expected diagnostics in the format [(line,col)]CODE:regex. "
+                + "CODE is the JSCompiler DiagnosticType key. regex matches the description.")
+    private List<String> expectedDiagnostics = new ArrayList<>();
+
     @Argument private List<String> arguments = new ArrayList<>();
     private final CmdLineParser parser;
 
@@ -1738,6 +1745,7 @@ public class CommandLineRunner extends AbstractCommandLineRunner<Compiler, Compi
           .setVariableMapOutputFile(flags.variableMapOutputFile)
           .setCreateNameMapFiles(flags.createNameMapFiles)
           .setPropertyMapOutputFile(flags.propertyMapOutputFile)
+          .setExpectedDiagnostics(flags.expectedDiagnostics)
           .setPropertyMapInputFile(flags.propertyMapInputFile)
           .setVariableMapInputFile(flags.variableMapInputFile)
           .setInstrumentationMappingFile(flags.instrumentationMappingOutputFile)
