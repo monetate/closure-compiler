@@ -357,7 +357,12 @@ public class Compiler extends AbstractCompiler implements ErrorHandler, SourceFi
         case PERFORMANT_WITH_ASYNC_STACKS ->
             options.setOutputFeatureSet(
                 FeatureSet.ES5.with(
-                    Feature.ASYNC_FUNCTIONS, Feature.ASYNC_GENERATORS, Feature.GENERATORS));
+                    Feature.ASYNC_FUNCTIONS,
+                    Feature.ASYNC_GENERATORS,
+                    Feature.GENERATORS,
+                    Feature.LET_DECLARATIONS,
+                    Feature.CONST_DECLARATIONS,
+                    Feature.BLOCK_SCOPED_FUNCTION_DECLARATION));
       }
     }
   }

@@ -5294,7 +5294,7 @@ async function abc() {
         options,
         "window['C'] = /** @dict */ class C { async f(p) { await p; return 0; } }",
         """
-        var $jscomp$classDecl$98447280$0 = function() {};
+        const $jscomp$classDecl$98447280$0 = function() {};
         $jscomp$classDecl$98447280$0.prototype.f = async function(p) { await p; return 0 };
         window['C'] = $jscomp$classDecl$98447280$0
         """);
@@ -5313,9 +5313,9 @@ async function abc() {
         options,
         "class C { async f(p) { let obj = await p; return obj?.prop; } }",
         """
-        var C=function(){};
-        C.prototype.f=async function(p){var obj=await p;
-          var $jscomp$optchain$tmp98447280$0;
+        let C=function(){};
+        C.prototype.f=async function(p){let obj=await p;
+          let $jscomp$optchain$tmp98447280$0;
           return($jscomp$optchain$tmp98447280$0=obj)==null?void 0:$jscomp$optchain$tmp98447280$0.prop}
         """);
   }
