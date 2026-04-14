@@ -1489,6 +1489,65 @@ public final class TypeCheckTest extends TypeCheckTestCase {
   }
 
   @Test
+  public void testWellKnownSymbolTypeofNarrowing_removingOtherTypeFromUnion() {
+    newTest()
+        .addExterns(
+            """
+            /** @type {symbol} */ Symbol.gbigintInternal;
+            /** @interface */ function GbigintType() {}
+            /** @const {symbol} */ GbigintType.prototype.__doNotManuallySet;
+            /** @typedef {!GbigintType|(typeof Symbol.gbigintInternal)} */
+            let gbigint2;
+            """)
+        .addSource(
+            """
+            /** @return {string|!gbigint2} */
+            function foo() {
+              return 'lalala';
+            }
+
+            /** @return {string|!gbigint2} */
+            function bar() {
+              const x = foo();
+              if (typeof x === 'string') {
+                return 'hi!';
+              }
+              return x;
+            }
+            """)
+        .run();
+  }
+
+  @Test
+  public void testWellKnownSymbolTypeofNarrowing_narrowingToSymbol() {
+    newTest()
+        .addExterns(
+            """
+            /** @type {symbol} */ Symbol.gbigintInternal;
+            /** @interface */ function GbigintType() {}
+            /** @const {symbol} */ GbigintType.prototype.__doNotManuallySet;
+            /** @typedef {!GbigintType|(typeof Symbol.gbigintInternal)} */
+            let gbigint2;
+            """)
+        .addSource(
+            """
+            /** @return {string|!gbigint2} */
+            function foo() {
+              return 'lalala';
+            }
+
+            function bar() {
+              const x = foo();
+              if (typeof x === 'symbol') {
+                /** @type {!gbigint2} */
+                const test = x;
+              }
+            }
+            """)
+        .run();
+  }
+
+  @Test
   public void testTypeOfReduction3() {
     newTest()
         .addSource(
