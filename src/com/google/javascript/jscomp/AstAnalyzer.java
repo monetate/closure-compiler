@@ -66,8 +66,6 @@ public class AstAnalyzer {
   private static final ImmutableSet<String> BUILTIN_FUNCTIONS_WITHOUT_SIDEEFFECTS =
       ImmutableSet.of(
           "Object", "Array", "String", "Number", "BigInt", "Boolean", "RegExp", "Error");
-  private static final ImmutableSet<String> OBJECT_METHODS_WITHOUT_SIDEEFFECTS =
-      ImmutableSet.of("toString", "valueOf");
   private static final ImmutableSet<String> REGEXP_METHODS = ImmutableSet.of("test", "exec");
   private static final ImmutableSet<String> STRING_REGEXP_METHODS =
       ImmutableSet.of("match", "replace", "search", "split");
@@ -163,9 +161,12 @@ public class AstAnalyzer {
         return false;
       }
     } else if (callee.isGetProp() || callee.isOptChainGetProp()) {
-      if (callNode.hasOneChild()
-          && assumeKnownBuiltinsArePure
-          && OBJECT_METHODS_WITHOUT_SIDEEFFECTS.contains(callee.getString())) {
+      String method = callee.getString();
+      if (assumeKnownBuiltinsArePure
+          && ("valueOf".equals(method)
+              ? callNode.hasOneChild()
+              : "toString".equals(method)
+                  && (callNode.hasOneChild() || callNode.hasTwoChildren()))) {
         return false;
       }
 
@@ -181,7 +182,7 @@ public class AstAnalyzer {
           && callee.getFirstChild().isName()
           && callee.isQualifiedName()
           && callee.getFirstChild().getString().equals("Math")) {
-        switch (callee.getString()) {
+        switch (method) {
           case "abs",
               "acos",
               "acosh",
@@ -226,13 +227,12 @@ public class AstAnalyzer {
       }
 
       if (!hasRegexpGlobalReferences && assumeKnownBuiltinsArePure) {
-        if (callee.getFirstChild().isRegExp() && REGEXP_METHODS.contains(callee.getString())) {
+        if (callee.getFirstChild().isRegExp() && REGEXP_METHODS.contains(method)) {
           return false;
         } else if (isTypedAsString(callee.getFirstChild())) {
           // Unlike regexs, string methods don't need to be hosted on a string literal
           // to avoid leaking mutating global state changes, it is just necessary that
           // the regex object can't be referenced.
-          String method = callee.getString();
           Node param = callee.getNext();
           if (param != null) {
             if (param.isStringLit()) {
