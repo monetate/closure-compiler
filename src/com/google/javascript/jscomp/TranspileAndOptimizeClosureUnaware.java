@@ -16,6 +16,7 @@
 
 package com.google.javascript.jscomp;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
@@ -76,12 +77,8 @@ class TranspileAndOptimizeClosureUnaware implements CompilerPass {
       if (!n.isClosureUnawareCode()) {
         return false;
       }
-      JSDocInfo fileJsDoc = n.getJSDocInfo();
-      if (fileJsDoc == null || fileJsDoc.getPerFileClosureUnawareMode() == null) {
-        // TODO: b/475302905 - remove this null check, once the JSC release to always serialize a
-        // ClosureUnawareMode lands.
-        return true;
-      }
+      JSDocInfo fileJsDoc =
+          checkNotNull(n.getJSDocInfo(), "closure unaware script must have JSDoc, found %s", n);
       var minificationLevel = fileJsDoc.getPerFileClosureUnawareMode();
       return switch (minificationLevel) {
         case UNSPECIFIED, SIMPLE -> true;
