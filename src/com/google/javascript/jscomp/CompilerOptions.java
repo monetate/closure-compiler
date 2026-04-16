@@ -3704,12 +3704,17 @@ public class CompilerOptions {
   public static enum TracerMode {
     ALL, // Collect all timing and size metrics. Very slow.
     RAW_SIZE, // Collect all timing and size metrics, except gzipped size. Slow.
+    AST_SIZE_AND_PRUNING, // Collect AST size data and metrics on the impact of dependency pruning.
     AST_SIZE, // For size data, don't serialize the AST, just count the number of nodes.
     TIMING_ONLY, // Collect timing metrics only.
     OFF; // Collect no timing and size metrics.
 
     public boolean isOn() {
       return this != OFF;
+    }
+
+    public boolean doPruningAnalysis() {
+      return this == AST_SIZE_AND_PRUNING || this == ALL || this == RAW_SIZE;
     }
   }
 
