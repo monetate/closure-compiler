@@ -185,7 +185,7 @@ public final class RewriteClassMembersTest extends CompilerTestCase {
         assertThrows(
             Throwable.class,
             () -> test(PRIVATE_FIELDS_AND_METHODS_INPUT, PRIVATE_FIELDS_AND_METHODS_EXPECTED));
-    assertThat(e.getMessage()).contains(PRIVATE_FIELDS_AND_METHODS_ERROR_MESSAGE);
+    assertThat(e).hasMessageThat().contains(PRIVATE_FIELDS_AND_METHODS_ERROR_MESSAGE);
   }
 
   @Test
@@ -201,7 +201,7 @@ public final class RewriteClassMembersTest extends CompilerTestCase {
         assertThrows(
             Throwable.class,
             () -> test(PRIVATE_FIELDS_AND_METHODS_INPUT, PRIVATE_FIELDS_AND_METHODS_EXPECTED));
-    assertThat(e.getMessage()).contains(PRIVATE_FIELDS_AND_METHODS_ERROR_MESSAGE);
+    assertThat(e).hasMessageThat().contains(PRIVATE_FIELDS_AND_METHODS_ERROR_MESSAGE);
   }
 
   @Test
