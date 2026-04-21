@@ -816,6 +816,34 @@ public class NodeTest {
   }
 
   @Test
+  public void serializeProperties_privateIdentifier() {
+    // TODO(b/236744850): PropTranslator maps Prop.PRIVATE_IDENTIFIER to null, so
+    // serializeProperties() silently drops the flag even when isPrivateIdentifier() is true in
+    // memory.
+    Node node = Node.newString(Token.NAME, "#field");
+    node.setPrivateIdentifier();
+    assertThat(node.isPrivateIdentifier()).isTrue(); // prop IS set in memory...
+    assertThat(node.serializeProperties()).isEqualTo(0L); // ...but NOT written to the bitset
+  }
+
+  @Test
+  public void serializeProperties_privateIdentifierRoundTrip() {
+    // TODO(b/236744850): after a serialize → deserialize round-trip, isPrivateIdentifier() returns
+    // false. The PRIVATE_IDENTIFIER prop is absent from the TypedAST proto, so deserialization
+    // never reconstructs it — any pass running after deserialization sees false for every
+    // private-field node.
+    Node original = Node.newString(Token.NAME, "#field");
+    original.setSourceFileForTesting("sourcefile");
+    Node restored = original.cloneNode(); // clone BEFORE setPrivateIdentifier
+    original.setPrivateIdentifier();
+
+    restored.deserializeProperties(original.serializeProperties(), false);
+
+    assertThat(original.isPrivateIdentifier()).isTrue(); // prop survives on the original...
+    assertThat(restored.isPrivateIdentifier()).isFalse(); // ...but is lost after round-trip
+  }
+
+  @Test
   public void testSerializeProperties_typeBeforeCast() {
     TestErrorReporter testErrorReporter = new TestErrorReporter();
     JSTypeRegistry registry = new JSTypeRegistry(testErrorReporter);
