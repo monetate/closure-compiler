@@ -816,31 +816,26 @@ public class NodeTest {
   }
 
   @Test
-  public void serializeProperties_privateIdentifier() {
-    // TODO(b/236744850): PropTranslator maps Prop.PRIVATE_IDENTIFIER to null, so
-    // serializeProperties() silently drops the flag even when isPrivateIdentifier() is true in
-    // memory.
+  public void testSerializeProperties_privateIdentifier() {
     Node node = Node.newString(Token.NAME, "#field");
     node.setPrivateIdentifier();
-    assertThat(node.isPrivateIdentifier()).isTrue(); // prop IS set in memory...
-    assertThat(node.serializeProperties()).isEqualTo(0L); // ...but NOT written to the bitset
+    long result = node.serializeProperties();
+    assertThat(result)
+        .isEqualTo(bitsetFromNodeProperties(ImmutableSet.of(NodeProperty.PRIVATE_IDENTIFIER)));
   }
 
   @Test
-  public void serializeProperties_privateIdentifierRoundTrip() {
-    // TODO(b/236744850): after a serialize → deserialize round-trip, isPrivateIdentifier() returns
-    // false. The PRIVATE_IDENTIFIER prop is absent from the TypedAST proto, so deserialization
-    // never reconstructs it — any pass running after deserialization sees false for every
-    // private-field node.
+  public void testSerializeProperties_privateIdentifierRoundTrip() {
     Node original = Node.newString(Token.NAME, "#field");
     original.setSourceFileForTesting("sourcefile");
     Node restored = original.cloneNode(); // clone BEFORE setPrivateIdentifier
-    original.setPrivateIdentifier();
 
+    assertThat(restored.isPrivateIdentifier()).isFalse();
+
+    original.setPrivateIdentifier();
     restored.deserializeProperties(original.serializeProperties(), false);
 
-    assertThat(original.isPrivateIdentifier()).isTrue(); // prop survives on the original...
-    assertThat(restored.isPrivateIdentifier()).isFalse(); // ...but is lost after round-trip
+    assertThat(restored.isPrivateIdentifier()).isTrue();
   }
 
   @Test
