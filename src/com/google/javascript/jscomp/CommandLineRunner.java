@@ -1853,7 +1853,6 @@ public class CommandLineRunner extends AbstractCommandLineRunner<Compiler, Compi
               + LanguageMode.validCommandLineNames());
     }
 
-
     options.setCodingConvention(new ClosureCodingConvention());
 
     options.setExtraAnnotationNames(flags.extraAnnotationName);
@@ -1886,6 +1885,7 @@ public class CommandLineRunner extends AbstractCommandLineRunner<Compiler, Compi
         || flags.isolationMode == IsolationMode.IIFE
         || flags.chunkOutputType == ChunkOutputType.ES_MODULES) {
       level.setWrappedOutputOptimizations(options);
+      options.setAssumeGlobalScopeIsIsolated(true);
     }
 
     if (flags.typedAstOutputFile != null) {

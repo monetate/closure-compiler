@@ -479,6 +479,12 @@ public class CompilerOptions {
   /** Merge two variables together as one. */
   private boolean coalesceVariableNames;
 
+  /** Lower block-scoped declarations to function-scoped declarations. */
+  private boolean optimizeLetAndConst;
+
+  /** Assume the global scope is lexically isolated (e.g. via IIFE or Module). */
+  private boolean assumeGlobalScopeIsIsolated;
+
   /** Move methods to a deeper chunk */
   private boolean crossChunkMethodMotion;
 
@@ -1453,6 +1459,8 @@ public class CompilerOptions {
     // Optimizations
     foldConstants = false;
     coalesceVariableNames = false;
+    optimizeLetAndConst = false;
+    assumeGlobalScopeIsIsolated = false;
     deadAssignmentElimination = false;
     deadPropertyAssignmentElimination = Tri.UNKNOWN;
     inlineConstantVars = false;
@@ -2380,6 +2388,22 @@ public class CompilerOptions {
 
   public boolean shouldCoalesceVariableNames() {
     return coalesceVariableNames;
+  }
+
+  public void setOptimizeLetAndConst(boolean optimizeLetAndConst) {
+    this.optimizeLetAndConst = optimizeLetAndConst;
+  }
+
+  public boolean shouldOptimizeLetAndConst() {
+    return optimizeLetAndConst;
+  }
+
+  public void setAssumeGlobalScopeIsIsolated(boolean assumeGlobalScopeIsIsolated) {
+    this.assumeGlobalScopeIsIsolated = assumeGlobalScopeIsIsolated;
+  }
+
+  public boolean shouldTreatGlobalScopeAsIsolated() {
+    return this.assumeGlobalScopeIsIsolated || this.renamePrefixNamespace != null;
   }
 
   public void setInlineLocalVariables(boolean inlineLocalVariables) {
