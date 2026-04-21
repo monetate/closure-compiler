@@ -538,7 +538,9 @@ public final class Es6NormalizeClasses implements NodeTraversal.ScopedCallback, 
               ? convNonCompFieldToGetProp(thisNode, instanceMember, /* isStatic= */ false)
               : convCompFieldToGetElem(thisNode, instanceMember, /* isStatic= */ false);
 
-      transpiledNode.insertBefore(checkNotNull(insertionPoint));
+      if (transpiledNode != null) {
+        transpiledNode.insertBefore(insertionPoint);
+      }
     }
 
     insertionPoint.detach();
@@ -661,8 +663,9 @@ public final class Es6NormalizeClasses implements NodeTraversal.ScopedCallback, 
    */
   private @Nullable Node createFieldAssignment(
       Node field, @Nullable Node fieldValue, Supplier<Node> createAssignLhs) {
-    if (transpileClassFields) {
-      // We don't need to keep around the field declaration.
+    // For public fields, we don't need to keep around the field declaration.
+    // For private fields, we still need to keep them in the class body due to syntax requirements.
+    if (transpileClassFields && !field.isPrivateIdentifier()) {
       field.detach();
     }
 
@@ -678,6 +681,8 @@ public final class Es6NormalizeClasses implements NodeTraversal.ScopedCallback, 
       fieldValue = astFactory.createUndefinedValue();
     } else {
       // We are going to move fieldValue to a new parent, so detach it now.
+      // (TODO: b/236744850): for private fields, consider keeping the initializers in the class
+      // body.
       fieldValue.detach();
     }
 

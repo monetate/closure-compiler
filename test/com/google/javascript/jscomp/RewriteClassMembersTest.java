@@ -47,7 +47,10 @@ public final class RewriteClassMembersTest extends CompilerTestCase {
       class Foo {
         #field_not_initialized;
         #field_initialized = 1;
-        static #staticField = 2;
+        // TODO(b/236744850): after rewriting, like static public fields, static private fields are
+        //   currently initialzed outside the class body, but it is illegal since they are private;
+        // static #static_field_not_initialized;
+        // static #static_field_initialized= 2;
         #method() {}
         static #staticMethod() {}
         #field_with_getter_and_setter = 3;
@@ -57,39 +60,30 @@ public final class RewriteClassMembersTest extends CompilerTestCase {
       }
       """;
 
-  // TODO(b/236744850): This is a placeholder for what the output of private fields and methods
-  // should be. They are not supported to be transpiled yet due to parser
-  // errors, and we need to fix them later.
+  // The non-static private fields are initialized inside the constructor.
   private static final String PRIVATE_FIELDS_AND_METHODS_EXPECTED =
       """
-      class Foo {
-        constructor() {
-          this.#field_not_initialized = void 0;
-          this.#field_initialized = 1;
-          this.#field_with_getter_and_setter = 3;
-        }
-        #method() {}
-        static #staticMethod() {}
-        get #prop() {
-          return this.#field_with_getter_and_setter;
-        }
-        set #prop(val) {
-          this.#field_with_getter_and_setter = val;
-        }
-        brandCheck(x) { return #field_not_initialized in x; }
+       class Foo {
+         constructor() {
+           this.#field_not_initialized = void 0;
+           this.#field_initialized = 1;
+           this.#field_with_getter_and_setter = 3;
+         }
+         #field_not_initialized;
+         #field_initialized;
+         #method() {}
+         static #staticMethod() {}
+         #field_with_getter_and_setter;
+         get #prop() {
+           return this.#field_with_getter_and_setter;
+         }
+         set #prop(val) {
+           this.#field_with_getter_and_setter = val;
+         }
+         brandCheck(x) {
+           return #field_not_initialized in x;
+         }
       }
-      Foo.#staticField = 2;
-      """;
-
-  private static final String PRIVATE_FIELDS_AND_METHODS_ERROR_MESSAGE =
-      """
-      Unexpected parse error(s): JSC_PARSE_ERROR. Parse error. Private fields must be declared in an enclosing class at testcode line 3 : 9
-      JSC_PARSE_ERROR. Parse error. Private fields must be declared in an enclosing class at testcode line 4 : 9
-      JSC_PARSE_ERROR. Parse error. Private fields must be declared in an enclosing class at testcode line 5 : 9
-      JSC_PARSE_ERROR. Parse error. Private fields must be declared in an enclosing class at testcode line 10 : 16
-      JSC_PARSE_ERROR. Parse error. Private fields must be declared in an enclosing class at testcode line 13 : 9
-      JSC_PARSE_ERROR. Parse error. Private fields must be declared in an enclosing class at testcode line 15 : 25
-      JSC_PARSE_ERROR. Parse error. Private identifiers may not be used in this context at testcode line 16 : 4
       """;
 
   @Override
@@ -175,33 +169,13 @@ public final class RewriteClassMembersTest extends CompilerTestCase {
   @Test
   public void testPrivateFieldsAndMethods() {
     setLanguageOut(LanguageMode.ECMASCRIPT_NEXT);
-    // Fails with parse error on expected output because the compiler produces
-    // invalid JS. The pass (Es6NormalizeClasses) removes the private field declarations (#field;
-    // and #field2;) from the class body (specifically in createFieldAssignment by calling
-    // field.detach()) because it treats them like public fields and assumes declarations
-    // are not needed when moved to the constructor. However, in JavaScript, private
-    // identifiers must be declared in the class and cannot be accessed outside.
-    Throwable e =
-        assertThrows(
-            Throwable.class,
-            () -> test(PRIVATE_FIELDS_AND_METHODS_INPUT, PRIVATE_FIELDS_AND_METHODS_EXPECTED));
-    assertThat(e).hasMessageThat().contains(PRIVATE_FIELDS_AND_METHODS_ERROR_MESSAGE);
+    test(PRIVATE_FIELDS_AND_METHODS_INPUT, PRIVATE_FIELDS_AND_METHODS_EXPECTED);
   }
 
   @Test
   public void testPrivateFieldsAndMethods_eS2021() {
     setLanguageOut(LanguageMode.ECMASCRIPT_2021);
-    // Fails with parse error on expected output because the compiler produces
-    // invalid JS. The pass (Es6NormalizeClasses) removes the private field declarations (#field;
-    // and #field2;) from the class body (specifically in createFieldAssignment by calling
-    // field.detach()) because it treats them like public fields and assumes declarations
-    // are not needed when moved to the constructor. However, in JavaScript, private
-    // identifiers must be declared in the class and cannot be accessed outside.
-    Throwable e =
-        assertThrows(
-            Throwable.class,
-            () -> test(PRIVATE_FIELDS_AND_METHODS_INPUT, PRIVATE_FIELDS_AND_METHODS_EXPECTED));
-    assertThat(e).hasMessageThat().contains(PRIVATE_FIELDS_AND_METHODS_ERROR_MESSAGE);
+    test(PRIVATE_FIELDS_AND_METHODS_INPUT, PRIVATE_FIELDS_AND_METHODS_EXPECTED);
   }
 
   @Test

@@ -909,7 +909,10 @@ public final class AstValidator implements CompilerPass {
   }
 
   private void validateClassField(Node n) {
-    validateFeature(Feature.PUBLIC_CLASS_FIELDS, n);
+    // TODO(b/236744850): Create a new validation function for private class fields.
+    if (!n.isPrivateIdentifier()) {
+      validateFeature(Feature.PUBLIC_CLASS_FIELDS, n);
+    }
     validateNonEmptyString(n);
     if (n.hasChildren()) {
       validateExpression(n.getFirstChild());
