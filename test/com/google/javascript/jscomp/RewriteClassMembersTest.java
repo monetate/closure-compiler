@@ -42,50 +42,6 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class RewriteClassMembersTest extends CompilerTestCase {
 
-  private static final String PRIVATE_FIELDS_AND_METHODS_INPUT =
-      """
-      class Foo {
-        #field_not_initialized;
-        #field_initialized = 1;
-        // TODO(b/236744850): after rewriting, like static public fields, static private fields are
-        //   currently initialzed outside the class body, but it is illegal since they are private;
-        // static #static_field_not_initialized;
-        // static #static_field_initialized= 2;
-        #method() {}
-        static #staticMethod() {}
-        #field_with_getter_and_setter = 3;
-        get #prop() { return this.#field_with_getter_and_setter; }
-        set #prop(val) { this.#field_with_getter_and_setter = val; }
-        brandCheck(x) { return #field_not_initialized in x; }
-      }
-      """;
-
-  // The non-static private fields are initialized inside the constructor.
-  private static final String PRIVATE_FIELDS_AND_METHODS_EXPECTED =
-      """
-       class Foo {
-         constructor() {
-           this.#field_not_initialized = void 0;
-           this.#field_initialized = 1;
-           this.#field_with_getter_and_setter = 3;
-         }
-         #field_not_initialized;
-         #field_initialized;
-         #method() {}
-         static #staticMethod() {}
-         #field_with_getter_and_setter;
-         get #prop() {
-           return this.#field_with_getter_and_setter;
-         }
-         set #prop(val) {
-           this.#field_with_getter_and_setter = val;
-         }
-         brandCheck(x) {
-           return #field_not_initialized in x;
-         }
-      }
-      """;
-
   @Override
   @Before
   public void setUp() throws Exception {
@@ -166,16 +122,119 @@ public final class RewriteClassMembersTest extends CompilerTestCase {
         """);
   }
 
-  @Test
-  public void testPrivateFieldsAndMethods() {
-    setLanguageOut(LanguageMode.ECMASCRIPT_NEXT);
-    test(PRIVATE_FIELDS_AND_METHODS_INPUT, PRIVATE_FIELDS_AND_METHODS_EXPECTED);
+  private void assertTranspilationOfPrivateClassPropertiesNotYetImplemented(String src) {
+    setLanguageOut(LanguageMode.ECMASCRIPT_2022);
+    // TODO(b/236744850): currently, Feature.PRIVATE_CLASS_PROPERTIES is set to ES_UNSUPPORTED. We
+    // need to update this test once we support private class properties.
+    AssertionError error1 = assertThrows(AssertionError.class, () -> test(src, src));
+    assertThat(error1)
+        .hasMessageThat()
+        .contains("Transpilation of 'Private class properties' is not yet implemented.");
+
+    setLanguageOut(LanguageMode.ECMASCRIPT_2021);
+    AssertionError error2 = assertThrows(AssertionError.class, () -> test(src, src));
+    assertThat(error2)
+        .hasMessageThat()
+        .contains("Transpilation of 'Private class properties' is not yet implemented.");
+
+    setLanguageOut(LanguageMode.UNSUPPORTED);
+    AssertionError error3 = assertThrows(AssertionError.class, () -> test(src, src));
+    assertThat(error3)
+        .hasMessageThat()
+        .contains("Transpilation of 'Private class properties' is not yet implemented.");
   }
 
   @Test
-  public void testPrivateFieldsAndMethods_eS2021() {
-    setLanguageOut(LanguageMode.ECMASCRIPT_2021);
-    test(PRIVATE_FIELDS_AND_METHODS_INPUT, PRIVATE_FIELDS_AND_METHODS_EXPECTED);
+  public void testPrivateField() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          #field;
+          #field_initialized = 1;
+        }
+        """);
+  }
+
+  @Test
+  public void testPrivateStaticField() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          static #static_field;
+          static #static_field_initialized = 2;
+        }
+        """);
+  }
+
+  @Test
+  public void testPrivateMethod() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          #method() {}
+        }
+        """);
+  }
+
+  @Test
+  public void testPrivateStaticMethod() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          static #staticMethod() {}
+        }
+        """);
+  }
+
+  @Test
+  public void testPrivateGetter() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          get #prop() { return 3; }
+        }
+        """);
+  }
+
+  @Test
+  public void testPrivateStaticGetter() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          static get #prop() { return 4; }
+        }
+        """);
+  }
+
+  @Test
+  public void testPrivateSetter() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          set #prop(val) {}
+        }
+        """);
+  }
+
+  @Test
+  public void testPrivateStaticSetter() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          static set #prop(val) {}
+        }
+        """);
+  }
+
+  @Test
+  public void testPrivateIdInOperator() {
+    assertTranspilationOfPrivateClassPropertiesNotYetImplemented(
+        """
+        class Foo {
+          #field;
+          brandCheck(x) { return #field in x; }
+        }
+        """);
   }
 
   @Test
