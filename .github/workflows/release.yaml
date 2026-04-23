@@ -16,7 +16,7 @@ name: Release Project
 permissions:
   contents: read
 
-# This workflow is triggered by pushes to the `master` branch.
+# This workflow is triggered by pushes to the `master` branch that modify '.github/piper-cut-cl.json'.
 # It first checks if `.github/piper-cut-cl.json` has been modified in the latest push.
 # If changes are detected, indicating a new release cut, the workflow proceeds to:
 # 1.  Tag the repository at the current commit with the new version ID.
@@ -24,8 +24,9 @@ permissions:
 # 3.  If tests pass, publish the release artifacts to Sonatype.
 on:
   push:
-    # TODO(dramaix): Trigger this workflow only when .github/piper-cut-cl.json is modified.
     branches: [ master ]
+    paths:
+      - '.github/piper-cut-cl.json'
 
 jobs:
   tag_release_version_id:
