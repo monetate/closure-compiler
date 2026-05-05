@@ -70,6 +70,8 @@ Intl.SegmentIterator.prototype[Symbol.iterator] = function() {};
 
 /**
  * @record
+ * @template T
+ * @extends {Iterable<T>}
  */
 Intl.Segments = function() {};
 
