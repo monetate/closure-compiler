@@ -195,7 +195,7 @@ public class TranspilationPasses {
                         compiler,
                         compiler.getOptions().getBrowserFeaturesetYearObject(),
                         compiler.getOptions().getOutputFeatureSet()));
-                if (compiler.getOptions().needsTranspilationOf(Feature.PRIVATE_CLASS_PROPERTIES)) {
+                if (compiler.getOptions().needsTranspilationOf(Feature.PRIVATE_ELEMENTS)) {
                   peepholeTranspilations.add(new RewritePrivateClassProperties(compiler));
                 }
                 if (compiler.getOptions().needsTranspilationOf(Feature.OPTIONAL_CATCH_BINDING)) {

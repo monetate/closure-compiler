@@ -124,24 +124,24 @@ public final class RewriteClassMembersTest extends CompilerTestCase {
 
   private void assertTranspilationOfPrivateClassPropertiesNotYetImplemented(String src) {
     setLanguageOut(LanguageMode.ECMASCRIPT_2022);
-    // TODO(b/236744850): currently, Feature.PRIVATE_CLASS_PROPERTIES is set to ES_UNSUPPORTED. We
+    // TODO(b/236744850): currently, Feature.PRIVATE_ELEMENTS is set to ES_UNSUPPORTED. We
     // need to update this test once we support private class properties.
     AssertionError error1 = assertThrows(AssertionError.class, () -> test(src, src));
     assertThat(error1)
         .hasMessageThat()
-        .contains("Transpilation of 'Private class properties' is not yet implemented.");
+        .contains("Transpilation of 'Private elements' is not yet implemented.");
 
     setLanguageOut(LanguageMode.ECMASCRIPT_2021);
     AssertionError error2 = assertThrows(AssertionError.class, () -> test(src, src));
     assertThat(error2)
         .hasMessageThat()
-        .contains("Transpilation of 'Private class properties' is not yet implemented.");
+        .contains("Transpilation of 'Private elements' is not yet implemented.");
 
     setLanguageOut(LanguageMode.UNSUPPORTED);
     AssertionError error3 = assertThrows(AssertionError.class, () -> test(src, src));
     assertThat(error3)
         .hasMessageThat()
-        .contains("Transpilation of 'Private class properties' is not yet implemented.");
+        .contains("Transpilation of 'Private elements' is not yet implemented.");
   }
 
   @Test

@@ -298,7 +298,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           #x=2;
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test
@@ -309,7 +309,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           static #x=2;
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test
@@ -320,7 +320,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           get #x() { return 1; }
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test
@@ -331,7 +331,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           set #x(val) {}
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test
@@ -342,7 +342,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           #m() {}
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test
@@ -356,7 +356,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           }
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test
@@ -367,7 +367,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           static #m() {}
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test
@@ -378,7 +378,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           static get #x() { return 1; }
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test
@@ -389,7 +389,7 @@ public final class AstValidatorTest extends CompilerTestCase {
           static set #x(val) {}
         }
         """,
-        Feature.PRIVATE_CLASS_PROPERTIES);
+        Feature.PRIVATE_ELEMENTS);
   }
 
   @Test

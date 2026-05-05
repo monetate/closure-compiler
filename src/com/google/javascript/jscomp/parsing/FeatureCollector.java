@@ -106,7 +106,7 @@ public final class FeatureCollector {
           addScriptFeature(Feature.CLASS_GETTER_SETTER);
         }
         if (node.isPrivateIdentifier()) {
-          addScriptFeature(Feature.PRIVATE_CLASS_PROPERTIES);
+          addScriptFeature(Feature.PRIVATE_ELEMENTS);
         }
       }
       case REGEXP -> addScriptFeature(Feature.REGEXP_SYNTAX);
@@ -116,7 +116,7 @@ public final class FeatureCollector {
           addScriptFeature(Feature.CLASS_GETTER_SETTER);
         }
         if (node.isPrivateIdentifier()) {
-          addScriptFeature(Feature.PRIVATE_CLASS_PROPERTIES);
+          addScriptFeature(Feature.PRIVATE_ELEMENTS);
         }
       }
       case BLOCK -> {
@@ -178,19 +178,19 @@ public final class FeatureCollector {
       case MEMBER_FUNCTION_DEF -> {
         addScriptFeature(Feature.MEMBER_DECLARATIONS);
         if (node.isPrivateIdentifier()) {
-          addScriptFeature(Feature.PRIVATE_CLASS_PROPERTIES);
+          addScriptFeature(Feature.PRIVATE_ELEMENTS);
         }
       }
       case MEMBER_FIELD_DEF -> {
         if (node.isPrivateIdentifier()) {
-          addScriptFeature(Feature.PRIVATE_CLASS_PROPERTIES);
+          addScriptFeature(Feature.PRIVATE_ELEMENTS);
         } else {
           addScriptFeature(Feature.PUBLIC_CLASS_FIELDS);
         }
       }
       case IN -> {
         if (node.getFirstChild() != null && node.getFirstChild().isPrivateIdentifier()) {
-          addScriptFeature(Feature.PRIVATE_CLASS_PROPERTIES);
+          addScriptFeature(Feature.PRIVATE_ELEMENTS);
         }
       }
       case COMPUTED_FIELD_DEF -> addScriptFeature(Feature.PUBLIC_CLASS_FIELDS);

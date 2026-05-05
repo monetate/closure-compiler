@@ -110,7 +110,7 @@ public final class Es6NormalizeClasses implements NodeTraversal.ScopedCallback, 
     // Note: This covers both public fields as well as static fields (they launched together).
     var options = compiler.getOptions();
     transpileClassFields = options.needsTranspilationOf(Feature.PUBLIC_CLASS_FIELDS);
-    transpilePrivateClassFields = options.needsTranspilationOf(Feature.PRIVATE_CLASS_PROPERTIES);
+    transpilePrivateClassFields = options.needsTranspilationOf(Feature.PRIVATE_ELEMENTS);
 
     doStaticInheritanceRewrites =
         options.getAssumeStaticInheritanceIsNotUsed() && !options.getSkipNonTranspilationPasses();
@@ -614,7 +614,7 @@ public final class Es6NormalizeClasses implements NodeTraversal.ScopedCallback, 
    */
   private void maybeReportPrivatePropertiesCannotConvertYet(Node n) {
     if (transpilePrivateClassFields && n.isPrivateIdentifier()) {
-      TranspilationUtil.cannotConvertYet(compiler, n, "Private class properties");
+      TranspilationUtil.cannotConvertYet(compiler, n, "Private elements");
     }
   }
 

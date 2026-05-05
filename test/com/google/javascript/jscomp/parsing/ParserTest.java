@@ -6162,14 +6162,13 @@ public final class ParserTest extends BaseJSTypeTestCase {
   @Test
   public void testPrivateProperty_unstable() {
     mode = LanguageMode.UNSTABLE;
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
-    parseWarning(
-        "class C { #f = 2; }", requiresLanguageModeMessage(Feature.PRIVATE_CLASS_PROPERTIES));
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
+    parseWarning("class C { #f = 2; }", requiresLanguageModeMessage(Feature.PRIVATE_ELEMENTS));
   }
 
   @Test
   public void testPrivateProperty_singleClassMember() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parse("class C { #f; }");
     parse("class C { #m() {} }");
@@ -6288,7 +6287,7 @@ public final class ParserTest extends BaseJSTypeTestCase {
 
   @Test
   public void testPrivateProperty_classMembersReferencingOtherPrivateField() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parse("class C { #f = 1; f = this.#f; }");
 
@@ -6325,7 +6324,7 @@ public final class ParserTest extends BaseJSTypeTestCase {
 
   @Test
   public void testPrivateProperty_classMethodsReferencingOtherPrivateProp() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parse("class C { #f = 1; method() { this.#f = 2; } }");
     parse("class C { #f = 1; #g = 2; method() { this.#f = this.#g; } }");
@@ -6345,7 +6344,7 @@ public final class ParserTest extends BaseJSTypeTestCase {
 
   @Test
   public void testPrivateProperty_nestedClasses() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parse(
         """
@@ -6401,7 +6400,7 @@ public final class ParserTest extends BaseJSTypeTestCase {
 
   @Test
   public void testPrivateProperty_classMethodsReferencingOtherPrivatePropViaOptionalChain() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parse("class C { #f = 1; method() { const t = this; t?.#f; } }");
     parse("class C { #pm() { const t = this; t?.#pm(); } }");
@@ -6620,7 +6619,7 @@ public final class ParserTest extends BaseJSTypeTestCase {
 
   @Test
   public void testPrivateProperty_inOperatorWithPrivateProp_valid() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parse("class C { #f = 1; static isC(x) { return #f in x; } }");
     parse("class C { #f = this; m() { return #f in this.#f; } }");
@@ -6660,21 +6659,21 @@ public final class ParserTest extends BaseJSTypeTestCase {
 
   @Test
   public void testPrivateProperty_inOperatorWithPrivateProp_invalid_nonExistentPrivateProp() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parseError("class C { static isC(x) { return #missing in x; } }", PRIVATE_FIELD_NOT_DEFINED);
   }
 
   @Test
   public void testPrivateProperty_inOperatorWithPrivateProp_invalid_privatePropOnRhs() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parseError("class C { #f = 1; static isC(x) { return #f in #f; } }", INVALID_PRIVATE_ID);
   }
 
   @Test
   public void testPrivateProperty_inOperatorWithPrivateProp_invalid_surroundingParenthesis() {
-    expectFeatures(Feature.PRIVATE_CLASS_PROPERTIES);
+    expectFeatures(Feature.PRIVATE_ELEMENTS);
 
     parseError("class C { #f = 1; static isC(x) { return (#f) in x; } }", INVALID_PRIVATE_ID);
   }

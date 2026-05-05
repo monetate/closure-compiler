@@ -34,7 +34,7 @@ final class RewritePrivateClassProperties extends AbstractPeepholeTranspilation 
 
   @Override
   FeatureSet getTranspiledAwayFeatures() {
-    return FeatureSet.BARE_MINIMUM.with(Feature.PRIVATE_CLASS_PROPERTIES);
+    return FeatureSet.BARE_MINIMUM.with(Feature.PRIVATE_ELEMENTS);
   }
 
   @Override

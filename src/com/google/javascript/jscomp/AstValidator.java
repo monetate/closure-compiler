@@ -858,7 +858,7 @@ public final class AstValidator implements CompilerPass {
       case MEMBER_FUNCTION_DEF -> {
         validateFeature(Feature.MEMBER_DECLARATIONS, n);
         if (n.isPrivateIdentifier()) {
-          validateFeature(Feature.PRIVATE_CLASS_PROPERTIES, n);
+          validateFeature(Feature.PRIVATE_ELEMENTS, n);
         }
         validateObjectLiteralKeyName(n);
         validateProperties(n);
@@ -868,7 +868,7 @@ public final class AstValidator implements CompilerPass {
       case GETTER_DEF, SETTER_DEF -> {
         validateFeature(Feature.CLASS_GETTER_SETTER, n);
         if (n.isPrivateIdentifier()) {
-          validateFeature(Feature.PRIVATE_CLASS_PROPERTIES, n);
+          validateFeature(Feature.PRIVATE_ELEMENTS, n);
         }
         validateObjectLiteralKeyName(n);
         validateObjectLitKey(n);
@@ -916,7 +916,7 @@ public final class AstValidator implements CompilerPass {
 
   private void validateClassField(Node n) {
     if (n.isPrivateIdentifier()) {
-      validateFeature(Feature.PRIVATE_CLASS_PROPERTIES, n);
+      validateFeature(Feature.PRIVATE_ELEMENTS, n);
     } else {
       validateFeature(Feature.PUBLIC_CLASS_FIELDS, n);
     }

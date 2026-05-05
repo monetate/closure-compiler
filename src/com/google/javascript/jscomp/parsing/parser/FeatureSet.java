@@ -334,7 +334,7 @@ public final class FeatureSet implements Serializable {
     // ES_UNSUPPORTED: Features that we can parse, but not yet supported in all checks
 
     // ES 2022 adds https://github.com/tc39/proposal-class-fields
-    PRIVATE_CLASS_PROPERTIES("Private class properties", LangVersion.ES_UNSUPPORTED),
+    PRIVATE_ELEMENTS("Private elements", LangVersion.ES_UNSUPPORTED),
 
     // TypeScript type syntax that will never be implemented in browsers. Only used as an indicator
     // to the CodeGenerator that it should handle type syntax.

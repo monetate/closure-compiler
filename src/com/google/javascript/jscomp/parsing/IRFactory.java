@@ -1399,7 +1399,7 @@ class IRFactory {
       String value;
       if (identifierToken.isPrivateIdentifier()) {
         if (identifierType == IdentifierType.CAN_BE_PRIVATE) {
-          maybeWarnForFeature(identifierToken, Feature.PRIVATE_CLASS_PROPERTIES);
+          maybeWarnForFeature(identifierToken, Feature.PRIVATE_ELEMENTS);
         } else {
           errorReporter.error(
               "Private identifiers may not be used in this context",
@@ -2156,7 +2156,7 @@ class IRFactory {
     // class fields: general case
     Node processField(FieldDeclarationTree tree) {
       if (tree.name.isPrivateIdentifier()) {
-        maybeWarnForFeature(tree, Feature.PRIVATE_CLASS_PROPERTIES);
+        maybeWarnForFeature(tree, Feature.PRIVATE_ELEMENTS);
       } else {
         maybeWarnForFeature(tree, Feature.PUBLIC_CLASS_FIELDS);
       }
